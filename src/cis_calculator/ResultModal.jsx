@@ -1,60 +1,93 @@
-import React from 'react';
-import { Box, Modal, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { TextField, Button, Typography } from '@mui/material';
 
-const ResultModal = ({ open, handleClose, amount, startDate, endDate, result }) => {
+const MyForm = () => {
+  const [amount, setAmount] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [resultAmount, setResultAmount] = useState('');
+
+  const handleAmountChange = (event) => {
+    setAmount(event.target.value);
+  };
+
+  const handleStartDateChange = (event) => {
+    setStartDate(event.target.value);
+  };
+
+  const handleEndDateChange = (event) => {
+    setEndDate(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    // Calculate result amount based on conditions
+    const selectedStartDate = new Date(startDate);
+    const selectedEndDate = new Date(endDate);
+
+    const nextMonthStartDate = new Date(selectedStartDate.getFullYear(), selectedStartDate.getMonth() + 1, 19);
+    const nextMonthEndDate = new Date(selectedStartDate.getFullYear(), selectedStartDate.getMonth() + 2, 19);
+
+    if (selectedEndDate <= nextMonthStartDate) {
+      setResultAmount(amount - 0);
+    } else if (selectedEndDate > nextMonthStartDate && selectedEndDate <= nextMonthEndDate) {
+      setResultAmount(amount - 100);
+    } else {
+      setResultAmount(amount - 200);
+    }
+
+    setSubmitted(true);
+  };
+
   return (
-    <Modal open={open} onClose={handleClose}>
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '60px',
-            background: '#f1f1f1f1',
-            position: 'relative',
-            boxShadow: '0 0 20px rgba(0, 0, 0, 0.2)',
-            overflow: 'hidden',
+    <div>
+      <form onSubmit={handleSubmit}>
+        <TextField
+          label="Amount for Omny"
+          value={amount}
+          onChange={handleAmountChange}
+          fullWidth
+          required
+        />
+        <TextField
+          label="Start Date"
+          type="date"
+          value={startDate}
+          onChange={handleStartDateChange}
+          InputLabelProps={{
+            shrink: true,
           }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              height: '100%',
-              background: 'rgba(255, 255, 255, 0.25)',
-              backdropFilter: 'blur(8px)',
-              zIndex: -1,
-            }}
-          />
-
-          <Typography variant="h5" style={{ marginBottom: '20px' }}>
-            Result
-          </Typography>
-
-          <Typography variant="body1" style={{ marginBottom: '20px' }}>
-            Amount: {amount}
-          </Typography>
-
-          <Typography variant="body1" style={{ marginBottom: '20px' }}>
-            Start Date: {startDate}
-          </Typography>
-
-          <Typography variant="body1" style={{ marginBottom: '20px' }}>
-            End Date: {endDate}
-          </Typography>
-
-          <Typography variant="body1">Result: {result}</Typography>
+          fullWidth
+          required
+        />
+        <TextField
+          label="End Date"
+          type="date"
+          value={endDate}
+          onChange={handleEndDateChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          fullWidth
+          required
+        />
+        <Button type="submit" variant="contained" color="primary">
+          Submit
+        </Button>
+      </form>
+      {submitted && (
+        <div>
+          <Typography variant="h6">Submitted Values:</Typography>
+          <Typography>Amount: {amount}</Typography>
+          <Typography>Start Date: {startDate}</Typography>
+          <Typography>End Date: {endDate}</Typography>
+          <Typography>Result Amount: {resultAmount}</Typography>
         </div>
-      </Box>
-    </Modal>
+      )}
+    </div>
   );
 };
 
-export default ResultModal;
+export default MyForm;
